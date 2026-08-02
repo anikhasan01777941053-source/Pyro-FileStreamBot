@@ -1,3 +1,7 @@
+import subprocess
+
+subprocess.run(["python3", "fix_session.py"], check=True)
+
 import time, calendar, email.utils, urllib.request
 try:
     req = urllib.request.Request('https://api.telegram.org', headers={'User-Agent': 'Mozilla/5.0'})
