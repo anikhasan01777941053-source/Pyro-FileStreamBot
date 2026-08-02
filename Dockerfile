@@ -8,4 +8,4 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["sh", "-c", "python3 fix_session.py; echo 'FIX DONE'; python3 -m WebStreamer; echo 'WEBSTREAMER EXITED'"]
+CMD ["python3", "-m", "WebStreamer"]
