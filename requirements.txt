@@ -1,10 +1,7 @@
 Pyrogram==1.4.16
-tgcrypto>=1.2.5
-aiohttp>=3.14.3
-aiofiles>=25.1.0
-fastapi>=0.141.1
-uvicorn[standard]>=0.52.0
-python-dotenv>=1.1.1
-motor>=3.7.1
-dnspython>=2.8.0
-requests>=2.32.0
+tgcrypto
+aiohttp
+python-dotenv
+motor
+aiofiles
+dnspython
