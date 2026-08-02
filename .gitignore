@@ -115,3 +115,7 @@ dmypy.json
 
 #session files
 *.session
+output/
+__pycache__/
+*.pyc
+.env
