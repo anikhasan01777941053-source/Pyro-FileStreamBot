@@ -1,4 +1,11 @@
-path = '/usr/local/lib/python3.14/dist-packages/pyrogram/session/session.py'
+import os
+import pyrogram
+
+path = os.path.join(
+    os.path.dirname(pyrogram.__file__),
+    "session",
+    "session.py"
+)
 with open(path, 'r') as f:
     code = f.read()
 
