@@ -21,9 +21,15 @@ target = """            elif isinstance(result, raw.types.BadMsgNotification):
 
 replacement = """            elif isinstance(result, raw.types.BadMsgNotification):
                 if result.error_code in (16, 17):
-                    print(f"[Auto-Fix] MTProto Error {result.error_code} detected!")
-                    self.time_offset += 25 if result.error_code == 16 else -25
+                    from pyrogram.session.internals.msg_id import MsgId
+
+                    MsgId.server_time += 25 if result.error_code == 16 else -25
+
+                    print(f"[Auto-Fix] MTProto Error {result.error_code}")
+                    print(f"[Auto-Fix] New server_time: {MsgId.server_time}")
+
                     return await self._send(data, wait_response, timeout)
+
                 raise BadMsgNotification(result.error_code)"""
 
 found = target in code
@@ -38,7 +44,7 @@ if found:
 
     print("Patch applied successfully!")
 else:
-    print("Target code not found.")
+    print("Target code not found or already patched.")
 
 idx = code.find("BadMsgNotification")
 if idx != -1:
