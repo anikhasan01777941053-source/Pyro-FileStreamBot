@@ -1,3 +1,20 @@
+import time, calendar, email.utils, urllib.request
+try:
+    req = urllib.request.Request('https://api.telegram.org', headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=5) as res:
+        date_str = res.headers.get('Date')
+        if date_str:
+            server_time = calendar.timegm(email.utils.parsedate(date_str))
+            time_diff = server_time - time.time()
+            if abs(time_diff) > 1:
+                _orig_time = time.time
+                time.time = lambda: _orig_time() + time_diff
+                print(f'Auto-synced Telegram clock offset: {time_diff:.2f}s')
+except Exception as e:
+    print('Clock sync notice:', e)
+
+import asyncio
+asyncio.set_event_loop(asyncio.new_event_loop())
 # This file is a part of TG-FileStreamBot
 # Coding: @EverythingSuckz & @AbirHasan2005
 

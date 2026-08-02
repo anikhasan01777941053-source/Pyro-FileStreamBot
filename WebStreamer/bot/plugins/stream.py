@@ -1,6 +1,7 @@
 # (c) @EverythingSuckz | @AbirHasan2005
 
 import asyncio
+import aiohttp
 import urllib.parse
 from WebStreamer.bot import StreamBot
 from WebStreamer.utils.database import Database
@@ -77,6 +78,44 @@ async def private_receive_handler(c: Client, m: Message):
                                     Var.PORT,
                                     log_msg.message_id,
                                     file_name)
+        process_api = (
+            "http://127.0.0.1:8000/api/process"
+            f"?stream_url={urllib.parse.quote(stream_link, safe='')}"
+            f"&title={urllib.parse.quote(file_name or str(log_msg.message_id), safe='')}"
+        )
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(process_api) as resp:
+                process_data = await resp.json()
+
+            status_url = (
+                "http://127.0.0.1:8000/api/status"
+                f"?title={urllib.parse.quote(file_name or str(log_msg.message_id), safe='')}"
+            )
+
+            while True:
+                await asyncio.sleep(5)
+
+                async with session.get(status_url) as check:
+                    status = await check.json()
+
+                if status.get("status") == "completed":
+                    links = status["download_links"]
+
+                    text = (
+                        "✅ Processing Completed!\n\n"
+                        f"🎬 HLS:\n{status['hls_stream_link']}\n\n"
+                        f"📥 1080p\n{links['1080p']}\n\n"
+                        f"📥 720p\n{links['720p']}\n\n"
+                        f"📥 480p\n{links['480p']}\n\n"
+                        f"📥 360p\n{links['360p']}"
+                    )
+
+                    await m.reply_text(
+                        text,
+                        disable_web_page_preview=True
+                    )
+                    break
 
         msg_text = "Bruh! 😁\nYour Link Generated! 🤓\n\n📂 **File Name:** `{}`\n**File Size:** `{}`\n\n📥 **Download Link:** `{}`"
         await log_msg.reply_text(text=f"Requested by [{m.from_user.first_name}](tg://user?id={m.from_user.id})\n**User ID:** `{m.from_user.id}`\n**Download Link:** {stream_link}", disable_web_page_preview=True, parse_mode="Markdown", quote=True)
@@ -119,5 +158,10 @@ async def channel_receive_handler(bot, broadcast):
                              text=f"Got FloodWait of {str(w.x)}s from {broadcast.chat.title}\n\n**Channel ID:** `{str(broadcast.chat.id)}`",
                              disable_web_page_preview=True, parse_mode="Markdown")
     except Exception as e:
-        await bot.send_message(chat_id=Var.BIN_CHANNEL, text=f"#ERROR_TRACEBACK: `{e}`", disable_web_page_preview=True, parse_mode="Markdown")
+        await bot.send_message(
+            chat_id=Var.BIN_CHANNEL,
+            text=f"#ERROR_TRACEBACK: `{e}`",
+            disable_web_page_preview=True,
+            parse_mode="Markdown"
+        )
         print(f"Can't Edit Broadcast Message!\nError: {e}")
