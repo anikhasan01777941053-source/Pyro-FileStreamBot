@@ -1,3 +1,4 @@
+print("=== FIX SESSION STARTED ===")
 import os
 import pyrogram
 
@@ -25,3 +26,5 @@ if target in code:
     print("Patched session.py successfully!")
 else:
     print("Target code updated or already patched.")
+
+print("=== PATCH FINISHED ===")
