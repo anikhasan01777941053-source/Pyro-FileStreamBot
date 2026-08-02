@@ -128,3 +128,13 @@ def status(title: str):
     return PROCESS_STATUS.get(title, {
         "status": "not_found"
     })
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "server:app",
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8000)),
+        log_level="info"
+    )
