@@ -1,33 +1,49 @@
 print("=== FIX SESSION STARTED ===")
+
 import os
 import pyrogram
+
+print("Pyrogram location:", pyrogram.__file__)
 
 path = os.path.join(
     os.path.dirname(pyrogram.__file__),
     "session",
     "session.py"
 )
-with open(path, 'r') as f:
+
+print("Session path:", path)
+
+with open(path, "r") as f:
     code = f.read()
 
-target = '            if isinstance(result, raw.types.BadMsgNotification):\n                raise BadMsgNotification(result.error_code)'
+target = """            elif isinstance(result, raw.types.BadMsgNotification):
+                raise BadMsgNotification(result.error_code)"""
 
-replacement = '''            if isinstance(result, raw.types.BadMsgNotification):
+replacement = """            elif isinstance(result, raw.types.BadMsgNotification):
                 if result.error_code in (16, 17):
-                    print(f"[Auto-Fix] MTProto Error {result.error_code} detected! Adjusting time offset...")
+                    print(f"[Auto-Fix] MTProto Error {result.error_code} detected!")
                     self.time_offset += 25 if result.error_code == 16 else -25
-                    return await self._send(data, timeout)
-                raise BadMsgNotification(result.error_code)'''
+                    return await self._send(data, wait_response, timeout)
+                raise BadMsgNotification(result.error_code)"""
 
-if target in code:
+found = target in code
+
+print("TARGET FOUND:", found)
+
+if found:
     code = code.replace(target, replacement)
-    with open(path, 'w') as f:
-        f.write(code)
-    print("Patched session.py successfully!")
-else:
-    print("Target code updated or already patched.")
 
-print("TARGET FOUND:", target in code)
-print(code[code.find("BadMsgNotification")-100:code.find("BadMsgNotification")+200])
+    with open(path, "w") as f:
+        f.write(code)
+
+    print("Patch applied successfully!")
+else:
+    print("Target code not found.")
+
+idx = code.find("BadMsgNotification")
+if idx != -1:
+    print("\n===== CODE AROUND BadMsgNotification =====")
+    print(code[max(0, idx - 200): idx + 500])
+    print("==========================================")
 
 print("=== PATCH FINISHED ===")
