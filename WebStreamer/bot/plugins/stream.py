@@ -14,6 +14,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 db = Database(Var.DATABASE_URL, Var.SESSION_NAME)
 
 SERVER_URL = os.getenv("SERVER_URL", "https://videoprocessingserver-rj5a.onrender.com").rstrip("/")
+BASE_URL = os.getenv("BASE_URL", "").rstrip("/")
 
 
 def get_media_file_size(m):
@@ -75,12 +76,12 @@ async def private_receive_handler(c: Client, m: Message):
     try:
         log_msg = await m.forward(chat_id=Var.BIN_CHANNEL)
         file_name = get_media_file_name(m)
+        if not file_name:
+            file_name = str(log_msg.message_id)
+
         file_size = humanbytes(get_media_file_size(m))
-        stream_link = "https://{}/{}/{}".format(Var.FQDN, log_msg.message_id, file_name) if Var.ON_HEROKU or Var.NO_PORT else \
-            "http://{}:{}/{}/{}".format(Var.FQDN,
-                                    Var.PORT,
-                                    log_msg.message_id,
-                                    file_name)
+
+        stream_link = f"{BASE_URL}/{log_msg.message_id}/{file_name}"
         process_api = (
             f"{SERVER_URL}/api/process"
             f"?stream_url={urllib.parse.quote(stream_link, safe='')}"
