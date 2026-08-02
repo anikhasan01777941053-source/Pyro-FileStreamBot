@@ -9,6 +9,7 @@ PROCESS_STATUS = {}
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=OUTPUT_DIR), name="static")
@@ -74,7 +75,7 @@ def process_video_background(stream_url: str, title: str, audio_count: int):
         subprocess.run(f'ffmpeg -y -i "{stream_url}" -map 0:v:0 -map 0:a:0 -vf scale=640:360 -c:v libx264 -c:a aac {mp4_dir}/{title}_360p.mp4', shell=True)
    
     fmt = "mkv" if audio_count > 1 else "mp4"
-    base_url = "http://127.0.0.1:8000/static"
+    base_url = f"{BASE_URL}/static"
 
     PROCESS_STATUS[title] = {
         "status": "completed",
@@ -102,7 +103,7 @@ def process_video(stream_url: str, title: str, background_tasks: BackgroundTasks
 
         background_tasks.add_task(process_video_background, stream_url, title, audio_count)
 
-        base_url = "http://127.0.0.1:8000/static"
+        base_url = f"{BASE_URL}/static"
         
         return {
             "success": True,
