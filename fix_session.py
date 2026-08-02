@@ -27,4 +27,7 @@ if target in code:
 else:
     print("Target code updated or already patched.")
 
+print("TARGET FOUND:", target in code)
+print(code[code.find("BadMsgNotification")-100:code.find("BadMsgNotification")+200])
+
 print("=== PATCH FINISHED ===")
